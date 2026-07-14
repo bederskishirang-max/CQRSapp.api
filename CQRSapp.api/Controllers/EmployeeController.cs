@@ -28,12 +28,26 @@ namespace CQRSapp.api.Controllers
 
         }
 
+
+
         [HttpPut]
         public async Task<IActionResult> UpdateEmployee([FromBody] UpdateEmployeeCommand command)
         {
             var result = await _sender.Send(command);
             return Ok(result);
         }
+
+        //[HttpPut("{employeeId:guid}")]
+        //public async Task<IActionResult> UpdateEmployee(
+        // [FromRoute] Guid employeeId,
+        // [FromBody] UpdateEmployeeCommand command) // Use a Request DTO here
+        //{
+        //    // Map the route ID and body request to your internal Command
+            
+
+        //    var result = await _sender.Send(command);
+        //    return Ok(result); // Or 'Return NoContent();' (HTTP 204) if you don't return data
+        //}
 
         [HttpGet]
         public async Task<IActionResult> GetAllEmployees()
@@ -42,10 +56,23 @@ namespace CQRSapp.api.Controllers
             return Ok(result);
         }
 
-        [HttpGet]
+        //[HttpGet]
+        //public async Task<IActionResult> GetEmployeeById([FromRoute] Guid employeeId)
+        //{
+        //    var result = await _sender.Send(new GetEmployeesByIDQuery(employeeId));
+        //    return Ok(result);
+        //}
+
+        [HttpGet("{employeeId:guid}")] // Explicitly constrain the route to a GUID
         public async Task<IActionResult> GetEmployeeById([FromRoute] Guid employeeId)
         {
             var result = await _sender.Send(new GetEmployeesByIDQuery(employeeId));
+
+            if (result == null)
+            {
+                return NotFound(); // Return 404 if the employee doesn't exist
+            }
+
             return Ok(result);
         }
     }
