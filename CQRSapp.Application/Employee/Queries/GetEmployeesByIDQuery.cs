@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace CQRSapp.Application.Employee.Queries
 {
-    public record GetEmployeesByIDQueries(Guid EmployeeID) : IRequest<EmployeesEntity>;
+    public record GetEmployeesByIDQuery(Guid EmployeeID) : IRequest<EmployeesEntity>;
 
-    public class GetEmployeesByIDQueriesHandler : IRequestHandler<GetEmployeesByIDQueries, EmployeesEntity>
+    public class GetEmployeesByIDQueriesHandler : IRequestHandler<GetEmployeesByIDQuery, EmployeesEntity>
     {
         private readonly IEmployeeRepository _employeeRepository;
 
@@ -20,7 +20,7 @@ namespace CQRSapp.Application.Employee.Queries
             _employeeRepository = employeeRepository;
         }
 
-        public async Task<EmployeesEntity> Handle(GetEmployeesByIDQueries request, CancellationToken cancellationToken)
+        public async Task<EmployeesEntity> Handle(GetEmployeesByIDQuery request, CancellationToken cancellationToken)
         {
             // Implement your logic to get employees by ID here
             return await _employeeRepository.GetEmployeeByIdAsync(request.EmployeeID);

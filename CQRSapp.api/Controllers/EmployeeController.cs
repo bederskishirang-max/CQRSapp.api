@@ -41,5 +41,12 @@ namespace CQRSapp.api.Controllers
             var result = await _sender.Send(new GetAllEmployeesQuery());
             return Ok(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEmployeeById([FromRoute] Guid employeeId)
+        {
+            var result = await _sender.Send(new GetEmployeesByIDQuery(employeeId));
+            return Ok(result);
+        }
     }
 }
