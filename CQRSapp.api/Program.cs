@@ -11,6 +11,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddApiDI(); // Call the extension method to add API services
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -2,6 +2,7 @@
 using CQRSapp.Infrastructure.Data;
 using CQRSapp.Infrastructure.Respository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,8 @@ namespace CQRSapp.Infrastructure
             services.AddDbContext<AppDbContext>(options =>
             {
                 // Configure your database provider and connection string here
-                options.UseSqlServer("ConnectionString");
+                options.UseSqlServer("DefaultConnection");
+               
             });
            
            
