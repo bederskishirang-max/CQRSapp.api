@@ -9,7 +9,14 @@ namespace CQRSapp.Application.Employee.Queries
 {
     public record GetEmployeesByIDQueries : IRequest<bool>;
 
-    public class
-    
-    
+    public class GetEmployeesByIDQueriesHandler : IRequestHandler<GetEmployeesByIDQueries, bool>
+    {
+        public Task<bool> Handle(GetEmployeesByIDQueries request, CancellationToken cancellationToken)
+        {
+            // Implement your logic to get employees by ID here
+            throw new NotImplementedException();
+        }
+    }
+
+
 }
