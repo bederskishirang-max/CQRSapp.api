@@ -1,0 +1,6 @@
+.vs/
+[Db]in/
+[Ob]ject/
+obj/
+bin/
+*.user
