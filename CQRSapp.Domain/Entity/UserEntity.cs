@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CQRSapp.Domain.Entity
 {
-    internal class UserEntity
+    public class UserEntity
     {
     }
 }

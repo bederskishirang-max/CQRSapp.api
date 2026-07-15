@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CQRSapp.Domain.Interfaces
 {
-    internal class IUserRepository
+    public interface IUserRepository
     {
     }
 }
