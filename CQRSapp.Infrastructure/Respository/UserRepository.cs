@@ -32,6 +32,7 @@ namespace CQRSapp.Infrastructure.Respository
         public async Task<UserEntity> AddUserAsync(UserEntity user)
         {
             user.Id = Guid.NewGuid();
+
             _dbcontext.Users.Add(user);
             await _dbcontext.SaveChangesAsync();
             return user;

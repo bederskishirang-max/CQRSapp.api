@@ -22,9 +22,9 @@ namespace CQRSapp.Application.Auth.Commands
 
         public async Task<bool> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
-            var existingUser = _userRepository.GetUserByUsernameAsync(request.Username);
+            var existingUser = await _userRepository.GetUserByUsernameAsync(request.Username);
 
-            if(existingUser != null)
+            if (existingUser != null)
             {
                 // User already exists, return false
                 return await Task.FromResult(false);
