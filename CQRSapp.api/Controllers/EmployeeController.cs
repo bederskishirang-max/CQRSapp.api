@@ -19,7 +19,7 @@ namespace CQRSapp.api.Controllers
             _sender = sender;
         }
 
-        [HttpPost]
+        [HttpPost("AddEmployee")]
         public async Task<IActionResult> AddEmployee([FromBody] AddEmployeeCommand command)
         {
             var result = await _sender.Send(command);
@@ -49,7 +49,7 @@ namespace CQRSapp.api.Controllers
         //    return Ok(result); // Or 'Return NoContent();' (HTTP 204) if you don't return data
         //}
 
-        [HttpGet]
+        [HttpGet("DisplayAllEmployee")]
         public async Task<IActionResult> GetAllEmployees()
         {
             var result = await _sender.Send(new GetAllEmployeesQuery());
@@ -73,6 +73,13 @@ namespace CQRSapp.api.Controllers
                 return NotFound(); // Return 404 if the employee doesn't exist
             }
 
+            return Ok(result);
+        }
+
+        [HttpDelete("{employeeId:guid}")]
+        public async Task<IActionResult> DeleteEmployee([FromRoute] Guid employeeId)
+        {
+            var result = await _sender.Send(new DeleteEmployeeCommand(employeeId));
             return Ok(result);
         }
     }
