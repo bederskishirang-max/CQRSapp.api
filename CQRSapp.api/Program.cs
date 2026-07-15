@@ -9,7 +9,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddApiDI(); // Call the extension method to add API services
+builder.Services.AddApiDI(builder.Configuration); // Call the extension method to add API services
+
 
 
 var app = builder.Build();
