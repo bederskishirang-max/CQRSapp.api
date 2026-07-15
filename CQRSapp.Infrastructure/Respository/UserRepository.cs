@@ -62,5 +62,10 @@ namespace CQRSapp.Infrastructure.Respository
             return true;
         }
 
+        public async Task<UserEntity> GetUserByUsernameAsync(string username)
+        {
+            return await _dbcontext.Users.FirstOrDefaultAsync(x => x.Username == username);
+        }
+
     }
 }

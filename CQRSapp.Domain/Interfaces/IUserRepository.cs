@@ -14,5 +14,6 @@ namespace CQRSapp.Domain.Interfaces
         Task<UserEntity> AddUserAsync(UserEntity user);
         Task<UserEntity> UpdateUserAsync(UserEntity user);
         Task<bool> DeleteUserAsync(Guid id);
+        Task<UserEntity> GetUserByUsernameAsync(string username);
     }
 }
