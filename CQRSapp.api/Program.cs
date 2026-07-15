@@ -43,35 +43,6 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-//// 2. REGISTER JWT AUTHENTICATION SERVICES
-//var jwtSecret = builder.Configuration["JwtSettings:Secret"];
-//var issuer = builder.Configuration["JwtSettings:Issuer"];
-//var audience = builder.Configuration["JwtSettings:Audience"];
-
-//if (string.IsNullOrEmpty(jwtSecret))
-//{
-//    throw new InvalidOperationException("JWT Secret key is missing from configuration.");
-//}
-
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//})
-//.AddJwtBearer(options =>
-//{
-//    options.TokenValidationParameters = new TokenValidationParameters
-//    {
-//        ValidateIssuer = true,
-//        ValidateAudience = true,
-//        ValidateLifetime = true,
-//        ValidateIssuerSigningKey = true,
-//        ValidIssuer = issuer,
-//        ValidAudience = audience,
-//        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
-//    };
-//});
-
 
 
 // 2. REGISTER JWT AUTHENTICATION SERVICES
