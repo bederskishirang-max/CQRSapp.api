@@ -1,5 +1,6 @@
 ﻿
 using CQRSapp.Domain.Employee;
+using CQRSapp.Domain.Entity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -16,5 +17,6 @@ namespace CQRSapp.Infrastructure.Data
         }
 
         public DbSet<EmployeesEntity> Employees { get; set; }
+        public DbSet<UserEntity> Users { get; set; }
     }
 }
