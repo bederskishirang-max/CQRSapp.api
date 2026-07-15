@@ -1,4 +1,6 @@
-﻿using CQRSapp.Domain.Interfaces;
+﻿using CQRSapp.Application.Auth.Services;
+using CQRSapp.Domain.Interfaces;
+using CQRSapp.Infrastructure.Authentication;
 using CQRSapp.Infrastructure.Data;
 using CQRSapp.Infrastructure.Respository;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +28,9 @@ namespace CQRSapp.Infrastructure
            
            
 
-            services.AddScoped<IEmployeeRepository, EmployeeRepository>(); 
+            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
             return services;
         }
     }

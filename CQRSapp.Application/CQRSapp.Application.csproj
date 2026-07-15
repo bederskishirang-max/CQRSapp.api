@@ -17,7 +17,6 @@
   <ItemGroup>
     <Folder Include="Auth\Commands\" />
     <Folder Include="Auth\DTOs\" />
-    <Folder Include="Auth\Services\" />
   </ItemGroup>
 
 </Project>
