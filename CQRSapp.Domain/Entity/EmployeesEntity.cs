@@ -15,5 +15,6 @@ namespace CQRSapp.Domain.Employee
 
         public string Phone { get; set; } = null;
 
+        public string DateCreated { get; set; } = DateTime.Now.ToString();
     }
 }

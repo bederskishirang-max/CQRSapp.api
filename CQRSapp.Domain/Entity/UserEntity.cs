@@ -13,5 +13,7 @@ namespace CQRSapp.Domain.Entity
         public string Username { get; set; } = string.Empty;
 
         public string PasswordHash { get; set; } = string.Empty;
+
+        public string DateCreated { get; set; } = DateTime.Now.ToString();
     }
 }

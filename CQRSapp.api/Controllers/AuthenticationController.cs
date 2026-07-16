@@ -29,18 +29,35 @@ namespace CQRSapp.api.Controllers
 
         }
 
+        //[HttpPost("Register")]
+        //public async Task<IActionResult> Register([FromBody] RegisterCommand command)
+        //{
+        //    var result = await _sender.Send(command);
+        //    if (result)
+        //    {
+        //        return Ok("User registered successfully.");
+        //    }
+        //    else
+        //    {
+        //        return BadRequest("Failed to register user.");
+        //    }
+        //}
+
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterCommand command)
         {
             var result = await _sender.Send(command);
             if (result)
             {
-                return Ok("User registered successfully.");
+                // 👈 CHANGED: Wrapped the message inside a JSON object property
+                return Ok(new { message = "User registered successfully." });
             }
             else
             {
-                return BadRequest("Failed to register user.");
+                // 👈 CHANGED: Wrapped the error inside a JSON object property
+                return BadRequest(new { error = "Failed to register user." });
             }
         }
+
     }
 }
