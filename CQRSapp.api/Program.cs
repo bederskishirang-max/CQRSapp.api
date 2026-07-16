@@ -74,6 +74,18 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Angular",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 builder.Services.AddApiDI(builder.Configuration); // Call the extension method to add API services
 
 var app = builder.Build();
@@ -86,6 +98,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("Angular");
 
 // 3. CONFIGURE MIDDLEWARE PIPELINE (Order is critical!)
 app.UseAuthentication(); // 👈 MUST come before UseAuthorization

@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace CQRSapp.Application.Auth.Commands
 {
-    public record LoginCommand(string Username, string Password) : IRequest<LoginResponse>;
+    public record LoginCommand(string Username, string Password) : IRequest<LoginResponse?>;
 
   
 
-    public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
+    public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse?>
     {
 
         private readonly IUserRepository _userRepository;
@@ -33,14 +33,14 @@ namespace CQRSapp.Application.Auth.Commands
 
             if (user == null)
             {
-                throw new Exception("User not found");
+                return null;
             }
 
             var validPassword = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
 
             if (!validPassword)
             {
-                throw new Exception("Invalid password");
+                return null;
             }
 
             var token = _jwtTokenGenerator.GenerateToken(user.Id,user.Username);
