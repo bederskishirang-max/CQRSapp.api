@@ -1,17 +1,19 @@
-using CQRSapp.Infrastructure.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CQRSapp.Infrastructure.Logging;
+namespace CQRSapp.Infrastructure.Exceptions;
 
 /// <summary>
-/// Extension methods for configuring exception handling services
+/// Extension methods for registering exception handling services in the DI container
 /// </summary>
 public static class ExceptionHandlingExtensions
 {
+    /// <summary>
+    /// Adds exception handling services to the DI container
+    /// </summary>
     public static IServiceCollection AddExceptionHandling(this IServiceCollection services)
     {
-        // Exception handling is registered as middleware in Program.cs
-        // This method is for future expansion if needed (e.g., custom exception handlers, etc.)
+        // Exception handling is configured via middleware in Program.cs
+        // This extension method is provided for consistency and future extensibility
         return services;
     }
 }

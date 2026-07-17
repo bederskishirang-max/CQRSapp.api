@@ -1,26 +1,25 @@
 namespace CQRSapp.Infrastructure.Exceptions;
 
 /// <summary>
-/// Custom exception for validation errors with detailed field-level information
+/// Represents validation exception with detailed error information
 /// </summary>
 public class ValidationException : Exception
 {
     public Dictionary<string, string[]> Errors { get; set; } = new();
 
-    public ValidationException(string message = "One or more validation failures have occurred.") 
+    public ValidationException(string message) : base(message)
+    {
+    }
+
+    public ValidationException(string message, Dictionary<string, string[]> errors) 
         : base(message)
     {
+        Errors = errors;
     }
 
     public ValidationException(Dictionary<string, string[]> errors) 
         : base("One or more validation failures have occurred.")
     {
         Errors = errors;
-    }
-
-    public ValidationException(string key, string[] messages) 
-        : base("One or more validation failures have occurred.")
-    {
-        Errors.Add(key, messages);
     }
 }
