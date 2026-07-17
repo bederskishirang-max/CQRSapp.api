@@ -29,6 +29,30 @@ public class GlobalExceptionHandler
         {
             await _next(context);
         }
+        catch (ValidationException ex)
+        {
+            stopwatch.Stop();
+            _logger.LogWarning(
+                "Validation error occurred. CorrelationId: {CorrelationId}, Errors: {@Errors}",
+                correlationId,
+                ex.Errors);
+
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            context.Response.ContentType = "application/json";
+
+            var response = new ExceptionDetails
+            {
+                CorrelationId = correlationId,
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = "Validation failed",
+                Details = ex.Message,
+                Path = context.Request.Path,
+                Timestamp = DateTime.UtcNow,
+                ValidationErrors = ex.Errors
+            };
+
+            await context.Response.WriteAsJsonAsync(response);
+        }
         catch (Exception exception)
         {
             stopwatch.Stop();
@@ -44,7 +68,7 @@ public class GlobalExceptionHandler
             var response = new ExceptionDetails
             {
                 CorrelationId = correlationId,
-                StatusCode = context.Response.StatusCode,
+                StatusCode = StatusCodes.Status500InternalServerError,
                 Message = "An unexpected error occurred",
                 Details = exception.Message,
                 Path = context.Request.Path,
