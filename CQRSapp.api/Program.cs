@@ -1,21 +1,91 @@
 using CQRSapp.api;
+using CQRSapp.Infrastructure.Authentication;
+using CQRSapp.Infrastructure.Logging;
+using CQRSapp.Infrastructure.Exceptions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models; // 👈 Added this namespace for OpenApiSecurityScheme
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
+// ============================================================================
+// STEP 1: CONFIGURE STRUCTURED LOGGING (Serilog)
+// ============================================================================
+builder.AddStructuredLogging();
 
-// 1. UPDATE SWAGGER CONFIGURATION TO SUPPORT AUTHORIZATION
+// ============================================================================
+// STEP 2: CONFIGURE JWT SETTINGS AND AUTHENTICATION
+// ============================================================================
+
+// Load JWT Configuration from appsettings.json
+var jwtSettingsSection = builder.Configuration.GetSection("JwtSettings");
+var jwtSettings = new JwtSettings
+{
+    Secret = jwtSettingsSection["Secret"] ?? throw new InvalidOperationException("JWT Secret is required"),
+    Issuer = jwtSettingsSection["Issuer"] ?? "CQRSapp.API",
+    Audience = jwtSettingsSection["Audience"] ?? "CQRSapp.Users",
+    AccessTokenExpiryMinutes = int.TryParse(jwtSettingsSection["AccessTokenExpiryMinutes"], out var accessExpiry) ? accessExpiry : 15,
+    RefreshTokenExpiryDays = int.TryParse(jwtSettingsSection["RefreshTokenExpiryDays"], out var refreshExpiry) ? refreshExpiry : 7
+};
+
+builder.Services.AddSingleton(jwtSettings);
+
+// Register JWT Token Service
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+
+// Configure JWT Authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret)),
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+// ============================================================================
+// STEP 3: CONFIGURE AUTHORIZATION
+// ============================================================================
+builder.Services.AddAuthorization(options =>
+{
+    // Define custom policies if needed
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireRole("Admin"));
+    
+    options.AddPolicy("UserOrAdmin", policy =>
+        policy.RequireRole("User", "Admin"));
+});
+
+// ============================================================================
+// STEP 4: CONFIGURE SWAGGER/OPENAPI WITH JWT SUPPORT
+// ============================================================================
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "CQRSapp API", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "CQRSapp API",
+        Version = "v1",
+        Description = "Enterprise CQRS Application with JWT Authentication",
+        Contact = new OpenApiContact
+        {
+            Name = "Development Team",
+            Email = "dev@cqrsapp.com"
+        }
+    });
 
-    // Define the OAuth2.0 / JWT Bearer Security Scheme
+    // Define JWT Bearer Security Scheme
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -23,10 +93,10 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\""
+        Description = "JWT Authorization header using the Bearer scheme.\r\n\r\nEnter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIs...\""
     });
 
-    // Make Swagger apply this security requirement globally
+    // Apply Security Requirement Globally
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -43,68 +113,78 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-
-
-// 2. REGISTER JWT AUTHENTICATION SERVICES
-var jwtSecret = builder.Configuration["JwtSettings:Secret"];
-var issuer = builder.Configuration["JwtSettings:Issuer"];
-var audience = builder.Configuration["JwtSettings:Audience"];
-
-if (string.IsNullOrEmpty(jwtSecret))
-{
-    throw new InvalidOperationException("JWT Secret key is missing from configuration.");
-}
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = issuer,       // Will correctly resolve "MyApp"
-        ValidAudience = audience,   // Will correctly resolve "MyAppUsers"
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret))
-    };
-});
-
-
+// ============================================================================
+// STEP 5: CONFIGURE CORS
+// ============================================================================
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("Angular",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:4200")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:4200", "http://localhost:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
 });
 
-builder.Services.AddApiDI(builder.Configuration); // Call the extension method to add API services
+// ============================================================================
+// STEP 6: CONFIGURE SERVICES
+// ============================================================================
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
 
+// Register API Services via Extension Method
+builder.Services.AddApiDI(builder.Configuration);
+
+// ============================================================================
+// STEP 7: CONFIGURE EXCEPTION HANDLING EXTENSION
+// ============================================================================
+builder.Services.AddExceptionHandling();
+
+// ============================================================================
+// BUILD THE APPLICATION
+// ============================================================================
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ============================================================================
+// STEP 8: CONFIGURE HTTP REQUEST PIPELINE
+// ============================================================================
+
+// Development Environment Configuration
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "CQRSapp API v1");
+        options.RoutePrefix = string.Empty; // Serve Swagger at root
+    });
 }
 
+// Global Exception Handling Middleware (MUST be first)
+app.UseGlobalExceptionHandler();
+
+// HTTPS Redirection
 app.UseHttpsRedirection();
 
-app.UseCors("Angular");
+// Correlation ID Middleware for request tracing
+app.UseCorrelationId();
 
-// 3. CONFIGURE MIDDLEWARE PIPELINE (Order is critical!)
-app.UseAuthentication(); // 👈 MUST come before UseAuthorization
+// Request/Response Logging
+app.UseRequestResponseLogging();
+
+// CORS Middleware
+app.UseCors("AllowFrontend");
+
+// Authentication and Authorization (Order is critical!)
+app.UseAuthentication();
 app.UseAuthorization();
 
+// Map Controllers
 app.MapControllers();
 
+// ============================================================================
+// START APPLICATION
+// ============================================================================
 app.Run();
