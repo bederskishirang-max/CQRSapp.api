@@ -1,8 +1,5 @@
 namespace CQRSapp.Infrastructure.Authentication;
 
-/// <summary>
-/// Response model for authentication tokens
-/// </summary>
 public class TokenResponse
 {
     public string AccessToken { get; set; } = string.Empty;
