@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cqrsapp-api
+    ports:
+      - "5000:80"
+      - "5001:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80;https://+:443
+      - ConnectionStrings__DefaultConnection=Server=sql-server;Database=CQRSapp;User Id=sa;Password=YourStrong@Password123;
+      - JwtSettings__Secret=your-super-secret-key-min-256-bits-long-change-in-production
+      - JwtSettings__Issuer=CQRSapp.API
+      - JwtSettings__Audience=CQRSapp.Users
+    depends_on:
+      - sql-server
+    networks:
+      - cqrsapp-network
+
+  sql-server:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: cqrsapp-db
+    environment:
+      SA_PASSWORD: YourStrong@Password123
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql-server-data:/var/opt/mssql
+    networks:
+      - cqrsapp-network
+
+volumes:
+  sql-server-data:
+
+networks:
+  cqrsapp-network:
+    driver: bridge
