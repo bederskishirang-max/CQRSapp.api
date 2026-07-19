@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Text.Json;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Builder;
 
 namespace CQRSapp.Infrastructure.Exceptions;
 

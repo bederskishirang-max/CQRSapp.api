@@ -2,6 +2,7 @@ using Serilog;
 using Serilog.Context;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
 
 namespace CQRSapp.Infrastructure.Logging;
 
