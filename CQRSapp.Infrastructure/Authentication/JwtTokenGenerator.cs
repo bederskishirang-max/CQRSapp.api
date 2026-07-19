@@ -37,7 +37,7 @@ namespace CQRSapp.Infrastructure.Authentication
                 issuer: _configuration["JwtSettings:Issuer"],
                 audience: _configuration["JwtSettings:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(5),
+                expires: DateTime.UtcNow.AddMinutes(2),
                 signingCredentials: credentials
             );
 
