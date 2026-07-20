@@ -43,6 +43,8 @@ namespace CQRSapp.Infrastructure.Authentication
 
             // Implementation for generating JWT token
             return new JwtSecurityTokenHandler().WriteToken(token);
+
+            
         }
     }
 }

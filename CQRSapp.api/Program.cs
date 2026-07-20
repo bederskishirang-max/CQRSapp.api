@@ -71,7 +71,10 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = issuer,       // Will correctly resolve "MyApp"
         ValidAudience = audience,   // Will correctly resolve "MyAppUsers"
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
+<<<<<<< HEAD
 
+=======
+>>>>>>> 787ce19 (update)
         ClockSkew = TimeSpan.Zero
     };
 });
